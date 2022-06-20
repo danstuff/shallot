@@ -60,11 +60,19 @@ Page::Page(std::string _filename) {
 }
 
 void Page::undo() {
+    if(doneStack.peek() != buffer_ptr->get_text()) {
+        record(true);
+    }
+
     undoneStack.push(doneStack.pop());
     buffer_ptr->set_text(doneStack.peek());
 }
 
 void Page::redo() {
+    if(doneStack.peek() != buffer_ptr->get_text()) {
+        record(true);
+    }
+
     doneStack.push(undoneStack.pop());
     buffer_ptr->set_text(doneStack.peek());
 }
