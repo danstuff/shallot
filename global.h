@@ -28,6 +28,8 @@ enum CtrlCommands {
 const char ESCAPE = 0x1B;
 const char RETURN = 0x0D;   
 const char TAB = 0x09;
+const char BACKSPACE = 0x08;
+const char DELETE = 0xFF;
 
 const char LEFT = 0x51;
 const char UP = 0x52;

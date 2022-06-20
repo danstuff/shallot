@@ -3,11 +3,10 @@
 
 #include "global.h"
 
-const uint UNDO_LEVELS = 512;
+const uint UNDO_LEVELS = 1024;
 
 class Action {
     public:
-        bool remove;
         int position;
         std::string content;
 
@@ -15,7 +14,7 @@ class Action {
 
         void nullify();
 
-        void perform(TextBufferPtr buffer, bool reversed = false);
+        void perform(TextBufferPtr buffer);
         void reverse(TextBufferPtr buffer);
 };
 
@@ -29,6 +28,8 @@ class ActionList {
 
         void push(Action a);
         Action pop();
+
+        void clear();
 };
 
 #endif

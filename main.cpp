@@ -1,37 +1,16 @@
 #include "global.h"
-#include "action.h"
+#include "page.h"
 
 #include <iostream>
 
-ActionList actDone;
-ActionList actUndone;
-
-Gtk::TextView* fileViewPtr = nullptr;
-
-uint countTabs() {
-    TextBufferPtr tb_ptr = fileViewPtr->get_buffer();
-
-    Gtk::TextIter line_indent = 
-        tb_ptr->get_insert()->get_iter();
-    
-    line_indent.set_line_offset(0);
-
-    uint tabs = 0;
-
-    while(line_indent.get_char() == '\t') {
-        tabs++;
-        line_indent++;
-    }
-
-    return tabs;
-}
+Page page;
 
 bool onCtrlKeyPress(GdkEventKey* event) {
     // find keyval the list of command keys
     uint key_index = CC_COUNT;
 
     for(uint i = 0; i < CC_COUNT; i++) {
-        if(commandKeys[i] == event->keyval) {
+        if(commandKeys[i] == event->keyval & 0xFF) {
             key_index = i;
             break;
         }
@@ -39,20 +18,8 @@ bool onCtrlKeyPress(GdkEventKey* event) {
 
     // handle command events
     switch(key_index) {
-        case CC_UNDO: 
-            {
-                Action a = actDone.pop();
-                a.reverse(fileViewPtr->get_buffer());
-                actUndone.push(a);
-                break;
-            }
-        case CC_REDO: 
-            {
-                Action a = actUndone.pop();
-                a.perform(fileViewPtr->get_buffer());
-                actDone.push(a);
-                break;
-            }
+        case CC_UNDO: page.undo(); break;
+        case CC_REDO: page.redo(); break;
         case CC_SAVE: break;
         case CC_SAVE_AS: break;
         case CC_OPEN: break;
@@ -70,7 +37,7 @@ bool onCtrlKeyPress(GdkEventKey* event) {
 }
 
 bool onAltKeyPress(GdkEventKey* event) {
-    switch(event->keyval) {
+    switch(event->keyval & 0xFF) {
         case UP: break;
         case DOWN: break;
         case LEFT: break;
@@ -92,23 +59,17 @@ bool onKeyPress(GdkEventKey* event) {
         return onAltKeyPress(event);
     }
 
+    page.record();
+
     switch(event->keyval & 0xFF) {
         case RETURN:
-            {
-                uint tabCount = countTabs();
-                std::string tabs = "\n";
-                for(uint i = 0; i < tabCount; i++) {
-                    tabs += '\t';
-                }
-                fileViewPtr->get_buffer()->insert_at_cursor(Glib::ustring(tabs));
-                break;
-            }
+            page.preserveTabs();
+            return true;
+            break;
         default:
             return false;
             break;
     }
-
-    return true;
 }
 
 int main(int argc, char *argv[]) {
@@ -124,7 +85,8 @@ int main(int argc, char *argv[]) {
     body.show();
     
     Gtk::TextView fileView;
-    fileViewPtr = &fileView;
+
+    page.buffer_ptr = fileView.get_buffer();
     
     fileView.set_monospace();
     fileView.signal_key_press_event().connect(&onKeyPress, false);

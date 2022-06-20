@@ -7,29 +7,20 @@ Action::Action() {
 }
 
 void Action::nullify() {
-    remove = false;
     position = -1;
     content = "";
 }
 
-void Action::perform(TextBufferPtr buffer, bool reversed) {
+void Action::perform(TextBufferPtr buffer) {
     if(position == -1 || content.length() <= 0) return;
     Gtk::TextIter it;
     it.set_offset(position);
 
-    if(remove != reversed) {
-        Gtk::TextIter it_end;
-        it_end.set_offset(position + content.length());
-
-        buffer->erase(it, it_end);
-
-    } else {
-        buffer->insert(it, Glib::ustring(content));
-    }
+    // TODO 
 }
 
 void Action::reverse(TextBufferPtr buffer) {
-    perform(buffer, true);
+    // TODO how to reverse a backspaced character?
 }
 
 // ACTION LIST
@@ -40,7 +31,7 @@ ActionList::ActionList() {
 }
 
 void ActionList::push(Action a) {
-    if(a.position == -1) return;
+    if(a.position == -1 || a.content.length() <= 0) return;
 
     end++;
 
@@ -68,4 +59,13 @@ Action ActionList::pop() {
     }
 
     return a;
+}
+
+void ActionList::clear() {
+    start = 0;
+    end = 0;
+
+    for(uint i = 0; i < UNDO_LEVELS; i++) {
+        list[i].nullify();
+    }
 }
