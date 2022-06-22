@@ -8,4 +8,4 @@ cmake --build .
 
 printf "\nDebugging project...\n\n"
 cd bin/
-gdb --batch-silent -ex run shallot
+gdb --batch -ex run shallot

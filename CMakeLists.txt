@@ -6,8 +6,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SHALLOT_SRC)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/src SHALLOT_SRC)
 
 # Locate and link to gtkmm
 find_package(PkgConfig)
