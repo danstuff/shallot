@@ -19,6 +19,8 @@ Controller::Controller(std::string filename) {
 
     layout.pack_end(pages[0], Gtk::PACK_EXPAND_WIDGET);
 
+    pages[0].grab_focus();
+
     layout.show();
 
     add(layout);
@@ -40,13 +42,17 @@ bool Controller::onKeyPress(GdkEventKey* event) {
 
     switch(event->keyval & 0xFF) {
         case RETURN:
-            pages[activePage].preserveLineHeight();
             pages[activePage].preserveTabs();
+            //pages[activePage].preserveLineHeight();
             return true;
             break;
-        case BACKSPACE:
         case DELETE:
-            pages[activePage].preserveLineHeight();
+            //pages[activePage].preserveLineHeight();
+            return false;
+            break;
+        case BACKSPACE:
+            //pages[activePage].forceBackspace();
+            //pages[activePage].preserveLineHeight();
             return false;
             break;
         default:
@@ -70,14 +76,16 @@ bool Controller::onCtrlKeyPress(GdkEventKey* event) {
     switch(key_index) {
         case CC_UNDO: pages[activePage].undo(); break;
         case CC_REDO: pages[activePage].redo(); break;
-        case CC_SAVE: break;
-        case CC_SAVE_AS: break;
+        case CC_SAVE_AS:
+            pages[activePage].filename = "";
+        case CC_SAVE:
+            pages[activePage].save();
+            break;
         case CC_OPEN: break;
         case CC_CLOSE: break;
         case CC_FIND_REPLACE: break;
         case CC_AUTO_COMPLETE: break;
         case CC_AUTO_INDENT: break;
-        case CC_WEB_ECHO: break;
         default:
             return false;
             break;

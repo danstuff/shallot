@@ -9,7 +9,7 @@
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/box.h>
 #include <gtkmm/textview.h>
-#include <gtkmm/label.h>
+#include <gtkmm/filechooserdialog.h>
 
 typedef unsigned int uint;
 typedef Glib::RefPtr<Gtk::TextBuffer> TextBufferPtr;

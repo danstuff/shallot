@@ -26,9 +26,12 @@ class Page : public Gtk::TextView {
         PageStack doneStack, undoneStack;
         uint actionCount;
 
+        std::string chooseFile(
+                Glib::ustring prompt,
+                Gtk::FileChooserAction action);
+
     public:
         std::string filename;
-        std::fstream file;
 
         Page(std::string _filename="");
 
@@ -42,6 +45,7 @@ class Page : public Gtk::TextView {
 
         void preserveTabs();
         void preserveLineHeight();
+        void forceBackspace();
 };
 
 #endif
