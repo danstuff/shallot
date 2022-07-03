@@ -1,0 +1,7 @@
+{
+    "cookie": "shallot-auth",
+    "secret": "something-random",
+    "password": "password",
+    "handshake": "hello-shallot",
+    "working_dir": "/home/dan/Projects/"
+}

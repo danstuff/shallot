@@ -1,0 +1,70 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font: 16px sans-serif;
+
+    background-color: #101;
+    color: white;
+}
+
+button, input, p, select {
+    border: none !important;
+    outline: none !important;
+
+    padding: 5px !important;
+    margin: 0 !important;
+
+    line-height: 16px;
+    
+    z-index: 2 !important;
+
+    background-image: none !important;
+    color: white !important;
+}
+
+input, p, select {
+    background-color: #202 !important;
+}
+
+button {
+    background-color: #303 !important;
+    cursor: pointer;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+
+    width: 100%;
+
+    background-color: #202;
+    color: white;
+}
+
+.float-left {
+    display: inline-block;
+    float: left;
+}
+
+.float-right {
+    display: inline-block;
+    float: right;
+}
+
+.centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+
+.pad-left {
+    padding-left: 25px;
+}
+
+#file-body {
+    display: none;
+}

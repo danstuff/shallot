@@ -1,0 +1,22 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    block content
+
+    div(class="footer")
+        p(id="foot_msg" class="float-left")
+        select(id="language" class="float-right")
+            option(value="cpp") C / C++
+            option(value="html") HTML
+            option(value="java") Java
+            option(value="js") JavaScript
+            option(value="json") JSON
+            option(value="md") Markdown
+            option(value="py") Python
+            option(value="xml") XML
+
+    script(src="/javascripts/vendor/jquery-3.6.0.min.js")
+    script(type="module" src="/javascripts/main.bundle.js")
