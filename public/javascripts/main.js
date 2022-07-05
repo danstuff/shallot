@@ -1,11 +1,13 @@
 import {basicSetup} from "codemirror"
 
+import {autocompletion, CompletionContext} from "@codemirror/autocomplete"
+
 import {EditorState, Compartment} from "@codemirror/state"
 
 import {EditorView, keymap} from "@codemirror/view"
 import {indentWithTab} from "@codemirror/commands"
 
-import {language} from "@codemirror/language"
+import {language, syntaxTree} from "@codemirror/language"
 
 import {cpp} from "@codemirror/lang-cpp"
 import {html} from "@codemirror/lang-html"
@@ -15,6 +17,35 @@ import {json} from "@codemirror/lang-json"
 import {markdown} from "@codemirror/lang-markdown"
 import {python} from "@codemirror/lang-python"
 import {xml} from "@codemirror/lang-xml"
+
+//autocomplete functionality
+let completions = ["ping", "pong", "Ping"];
+
+function myAutoComplete(context) {
+    if (context.explicit) {
+
+        // separate words by CamelCase and_underscores_too
+        let phrase = context.matchBefore(/[A-Z][a-z0-9]*|[a-z0-9]+/);
+
+        if(phrase) {
+            let options = [];
+
+            for(let i in completions) {
+                if(completions[i].includes(phrase.text)) {
+                    options.push({label: completions[i]});
+                }
+            }
+
+            return {
+                from: phrase.from,
+                options: options
+            };
+        }
+    }
+
+    return null
+}
+
 
 // custom theme
 let myTheme = EditorView.theme({
@@ -60,7 +91,7 @@ let myTheme = EditorView.theme({
     ".cm-search label": {
         float: "right",
     }
-}, {dark: true})
+}, {dark: true});
 
 // language detection based on combo box
 const langConf = new Compartment;
@@ -143,7 +174,8 @@ if($("#file-body").length) {
             keymap.of([indentWithTab]),
             keymap.of([{key: "Ctrl-s", run: postDoc}]),
             langConf.of(cpp()),
-            autoLang
+            autoLang,
+            autocompletion({ override: [myAutoComplete] })
         ],
         parent: document.querySelector("body")
     });

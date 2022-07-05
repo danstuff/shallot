@@ -46,7 +46,26 @@ function renderError(err, req, res) {
 
 }
 
-app.use('/login', function(req, res, next) {
+function routeEditor(req, res) {
+    let file_path = protect(req.url);
+
+    if(req.body.data) {
+        fs.writeFile(file_path, req.body.data, 'utf8', (err) => {});
+
+    } else {
+        fs.readFile(file_path, 'utf8', (err, data) => {
+            if(err) {
+                renderError(err, req, res);
+            } else {
+                res.render('index',
+                    { title: req.url, file_body: data }
+                );
+            }
+        });
+    }
+}
+
+function routeLogin(req, res) {
     if(req.body.password == settings.password) {
         res.cookie("shallot-auth", settings.handshake, { signed: true });
         res.json({ foot_msg : "Login OK" });
@@ -57,34 +76,14 @@ app.use('/login', function(req, res, next) {
     } else {
         res.render("login");
     }
-});
+}
 
 app.use('/', function(req, res, next) {
     if(req.signedCookies[settings.cookie] == settings.handshake) {
-        let file_path = protect(req.url);
-
-        if(req.body.data) {
-            fs.writeFile(file_path, req.body.data, 'utf8', (err) => {});
-
-        } else {
-            fs.readFile(file_path, 'utf8', (err, data) => {
-                if(err) {
-                    renderError(err, req, res);
-                } else {
-                    res.render('index',
-                        { title: req.url, file_body: data }
-                    );
-                }
-            });
-        }
+        routeEditor(req, res);
     } else {
-        next(createError(403));
+        routeLogin(req, res);
     }
-});
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
 });
 
 // error handler
