@@ -9,28 +9,17 @@ html, body {
     color: white;
 }
 
-button, input, p, select {
-    border: none !important;
-    outline: none !important;
+select, p {
+    border: none;
+    outline: none;
 
-    padding: 5px !important;
-    margin: 0 !important;
+    padding: 5px;
+    margin: 0;
 
-    line-height: 16px;
-    
-    z-index: 2 !important;
+    color: white;
 
-    background-image: none !important;
-    color: white !important;
-}
-
-input, p, select {
-    background-color: #202 !important;
-}
-
-button {
-    background-color: #303 !important;
-    cursor: pointer;
+    font-size: 70%;
+    background-color: #202;
 }
 
 .footer {
@@ -38,7 +27,6 @@ button {
     bottom: 0;
 
     width: 100%;
-
     background-color: #202;
     color: white;
 }

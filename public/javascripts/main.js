@@ -18,6 +18,8 @@ import {markdown} from "@codemirror/lang-markdown"
 import {python} from "@codemirror/lang-python"
 import {xml} from "@codemirror/lang-xml"
 
+import {easyEyes} from "./themes.js"
+
 //autocomplete functionality
 let completions = ["ping", "pong", "Ping"];
 
@@ -43,55 +45,8 @@ function myAutoComplete(context) {
         }
     }
 
-    return null
+    return null;
 }
-
-
-// custom theme
-let myTheme = EditorView.theme({
-    "&": {
-        color: "#fff",
-        backgroundColor: "#101"
-    },
-    ".cm-content": {
-        caretColor: "#fff"
-    },
-    "&.cm-focused .cm-cursor": {
-        borderLeftColor: "#fff"
-    },
-    "&.cm-focused .cm-selectionBackground": {
-        backgroundColor: "#303"
-    },
-    ".cm-selectionBackground": {
-        backgroundColor: "#303"
-    },
-    ".cm-gutters": {
-        backgroundColor: "#202",
-        color: "#ddd",
-        border: "none"
-    },
-    ".cm-activeLine": {
-        backgroundColor: "#202",
-    },
-    ".cm-activeLineGutter": {
-        backgroundColor: "#303",
-    },
-    ".cm-panels": {
-        position: "fixed",
-        bottom: "0",
-        backgroundColor: "#202",
-        marginRight: "128px !important",
-    },
-    ".cm-panel": {
-        padding: "0 !important", 
-    },
-    ".cm-search br, button[name='close'], button[name='next'], button[name='prev'], button[name='select']": {
-        display: "none",
-    }, 
-    ".cm-search label": {
-        float: "right",
-    }
-}, {dark: true});
 
 // language detection based on combo box
 const langConf = new Compartment;
@@ -149,18 +104,40 @@ $("#password").keypress(function(e) {
     if(code == 13) { // enter
         $.post(window.location.href,
             { password : $("#password").val() },
-            (d) => { showMessage(d.foot_msg); }
+            (d) => {
+                $("#password").val("");
+                showMessage(d.foot_msg);
+            }
         );
     }
 });
 
-// disable CTRL-S default behavior
 document.onkeydown = (e) => {
     let code = e.which || e.keyCode;
 
-    if(e.ctrlKey && code == 83) {
+    // disable CTRL-S default behavior
+    if(e.ctrlKey && code == 83) { // s
         e.preventDefault();
         e.stopPropagation();
+    }
+
+
+    // reroute a tab key press in find (ctrl-f) to replace and vice versa
+    if(e.ctrlKey && code == 70) { // f
+        function tabLink(a, b) {
+            $(a).keydown((e) => {
+                let code = e.which || e.keyCode;
+                if(code == 9) { // tab
+                    $(b).focus();
+                    
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+        }
+
+        tabLink(".cm-textfield[name=search]", ".cm-textfield[name=replace]");
+        tabLink(".cm-textfield[name=replace]", ".cm-textfield[name=search]");
     }
 }
 
@@ -169,7 +146,7 @@ if($("#file-body").length) {
     new EditorView({
         doc: $("#file-body").text(),
         extensions: [
-            myTheme,
+            easyEyes,
             basicSetup,
             keymap.of([indentWithTab]),
             keymap.of([{key: "Ctrl-s", run: postDoc}]),

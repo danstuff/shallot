@@ -28439,37 +28439,8 @@
        }));
    }
 
-   //autocomplete functionality
-   let completions = ["ping", "pong", "Ping"];
-
-   function myAutoComplete(context) {
-       if (context.explicit) {
-
-           // separate words by CamelCase and_underscores_too
-           let phrase = context.matchBefore(/[A-Z][a-z0-9]*|[a-z0-9]+/);
-
-           if(phrase) {
-               let options = [];
-
-               for(let i in completions) {
-                   if(completions[i].includes(phrase.text)) {
-                       options.push({label: completions[i]});
-                   }
-               }
-
-               return {
-                   from: phrase.from,
-                   options: options
-               };
-           }
-       }
-
-       return null
-   }
-
-
    // custom theme
-   let myTheme = EditorView.theme({
+   const easyEyes = EditorView.theme({
        "&": {
            color: "#fff",
            backgroundColor: "#101"
@@ -28499,9 +28470,9 @@
        },
        ".cm-panels": {
            position: "fixed",
-           bottom: "0",
+           bottom: "23px !important",
+           borderBottom: "1px solid black !important",
            backgroundColor: "#202",
-           marginRight: "128px !important",
        },
        ".cm-panel": {
            padding: "0 !important", 
@@ -28511,8 +28482,63 @@
        }, 
        ".cm-search label": {
            float: "right",
+       },
+       "button, input, label": {
+           border: "none !important",
+           borderLeft: "1px solid black !important",
+
+           outline: "none !important",
+
+           padding: "2px 5px 3px 5px !important",
+           margin: "0 !important",
+
+           lineHeight: "16px !important",
+           
+           backgroundImage: "none !important",
+           color: "white !important",
+
+           fontSize: "70% !important",
+       },
+       "input, label": {
+           backgroundColor: "#202 !important",
+       },
+       "button": {
+           backgroundColor: "#303 !important",
+           cursor: "pointer !important"
+       },
+       "input[type='checkbox']": {
+           color: "#303 !important",
+           marginRight: "5px !important"
        }
    }, {dark: true});
+
+   //autocomplete functionality
+   let completions = ["ping", "pong", "Ping"];
+
+   function myAutoComplete(context) {
+       if (context.explicit) {
+
+           // separate words by CamelCase and_underscores_too
+           let phrase = context.matchBefore(/[A-Z][a-z0-9]*|[a-z0-9]+/);
+
+           if(phrase) {
+               let options = [];
+
+               for(let i in completions) {
+                   if(completions[i].includes(phrase.text)) {
+                       options.push({label: completions[i]});
+                   }
+               }
+
+               return {
+                   from: phrase.from,
+                   options: options
+               };
+           }
+       }
+
+       return null;
+   }
 
    // language detection based on combo box
    const langConf = new Compartment;
@@ -28561,18 +28587,40 @@
        if(code == 13) { // enter
            $.post(window.location.href,
                { password : $("#password").val() },
-               (d) => { showMessage(d.foot_msg); }
+               (d) => {
+                   $("#password").val("");
+                   showMessage(d.foot_msg);
+               }
            );
        }
    });
 
-   // disable CTRL-S default behavior
    document.onkeydown = (e) => {
        let code = e.which || e.keyCode;
 
-       if(e.ctrlKey && code == 83) {
+       // disable CTRL-S default behavior
+       if(e.ctrlKey && code == 83) { // s
            e.preventDefault();
            e.stopPropagation();
+       }
+
+
+       // reroute a tab key press in find (ctrl-f) to replace and vice versa
+       if(e.ctrlKey && code == 70) { // f
+           function tabLink(a, b) {
+               $(a).keydown((e) => {
+                   let code = e.which || e.keyCode;
+                   if(code == 9) { // tab
+                       $(b).focus();
+                       
+                       e.preventDefault();
+                       e.stopPropagation();
+                   }
+               });
+           }
+
+           tabLink(".cm-textfield[name=search]", ".cm-textfield[name=replace]");
+           tabLink(".cm-textfield[name=replace]", ".cm-textfield[name=search]");
        }
    };
 
@@ -28581,7 +28629,7 @@
        new EditorView({
            doc: $("#file-body").text(),
            extensions: [
-               myTheme,
+               easyEyes,
                basicSetup,
                keymap.of([indentWithTab]),
                keymap.of([{key: "Ctrl-s", run: postDoc}]),
