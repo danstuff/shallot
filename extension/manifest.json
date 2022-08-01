@@ -1,0 +1,20 @@
+{
+    "manifest_version": 2,
+    "name": "Shallot",
+    "version": "1.0",
+
+    "description": 
+        "Scrapes your open tabs for Shallot Editor autocompletion suggestsions",
+
+    "icons": {
+        "48": "icons/shallot-48.png"
+    },
+
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["vendor/jquery-3.6.0.min.js", "main.js"]
+        }
+    ]
+
+}

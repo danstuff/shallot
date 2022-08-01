@@ -20,22 +20,44 @@ import {xml} from "@codemirror/lang-xml"
 
 import {easyEyes} from "./themes.js"
 
-//autocomplete functionality
-let completions = ["ping", "pong", "Ping"];
+const word_regex = /[A-Z]+[a-z0-9]*|[a-z0-9]+|[^A-Za-z0-9\s]/;
 
+// footer message fade out
+function showMessage(str) {
+    $("#foot_msg").html(str);
+    $("#foot_msg").show();
+
+    setTimeout(() => {
+        $("#foot_msg").fadeOut();
+    }, 1000);
+}
+
+//autocomplete functionality from server
 function myAutoComplete(context) {
     if (context.explicit) {
-
         // separate words by CamelCase and_underscores_too
-        let phrase = context.matchBefore(/[A-Z][a-z0-9]*|[a-z0-9]+/);
+        let phrase = context.matchBefore(word_regex);
 
         if(phrase) {
+            let responded = false;
             let options = [];
 
-            for(let i in completions) {
-                if(completions[i].includes(phrase.text)) {
-                    options.push({label: completions[i]});
+            $.get("/complete/"+phrase.text, 
+                (data) => {
+                    responded = true;
+                    options = data;
                 }
+            );
+
+            // wait 5s for a response
+            let timed_out = false;
+
+            setTimeout(() => {
+                timed_out = true;
+            }, 5000);
+
+            while(!responded && !timed_out) {
+                continue;
             }
 
             return {
@@ -52,7 +74,7 @@ function myAutoComplete(context) {
 const langConf = new Compartment;
 let lastFormat = "";
 
-const autoLang = EditorState.transactionExtender.of(
+const myAutoLanguage = EditorState.transactionExtender.of(
     tr => {
         if(!tr.docChanged) return null;
 
@@ -80,16 +102,6 @@ const autoLang = EditorState.transactionExtender.of(
     }
 );
 
-// footer message fade out
-function showMessage(str) {
-    $("#foot_msg").html(str);
-    $("#foot_msg").show();
-
-    setTimeout(() => {
-        $("#foot_msg").fadeOut();
-    }, 1000);
-}
-
 // post to save
 function postDoc(view) {
     showMessage("Saved");
@@ -97,20 +109,6 @@ function postDoc(view) {
         { data: view.state.doc.toString() }
     );
 }
-
-// enter to submit a password
-$("#password").keypress(function(e) {
-    let code = e.which || e.keyCode;
-    if(code == 13) { // enter
-        $.post(window.location.href,
-            { password : $("#password").val() },
-            (d) => {
-                $("#password").val("");
-                showMessage(d.foot_msg);
-            }
-        );
-    }
-});
 
 document.onkeydown = (e) => {
     let code = e.which || e.keyCode;
@@ -120,7 +118,6 @@ document.onkeydown = (e) => {
         e.preventDefault();
         e.stopPropagation();
     }
-
 
     // reroute a tab key press in find (ctrl-f) to replace and vice versa
     if(e.ctrlKey && code == 70) { // f
@@ -143,7 +140,7 @@ document.onkeydown = (e) => {
 
 // create the editor if you're on an edit page
 if($("#file-body").length) {
-    new EditorView({
+    let ev = new EditorView({
         doc: $("#file-body").text(),
         extensions: [
             easyEyes,
@@ -151,10 +148,12 @@ if($("#file-body").length) {
             keymap.of([indentWithTab]),
             keymap.of([{key: "Ctrl-s", run: postDoc}]),
             langConf.of(cpp()),
-            autoLang,
+            myAutoLanguage,
             autocompletion({ override: [myAutoComplete] })
         ],
         parent: document.querySelector("body")
     });
+
+    ev.focus();
 }
 

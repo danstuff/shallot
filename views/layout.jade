@@ -3,6 +3,7 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
+
   body
     block content
 
@@ -19,4 +20,9 @@ html
             option(value="xml") XML
 
     script(src="/javascripts/vendor/jquery-3.6.0.min.js")
-    script(type="module" src="/javascripts/main.bundle.js")
+    script(type="module" src="/javascripts/login.js")
+
+    if is_directory
+        script(type="module" src="/javascripts/directory.bundle.js")
+    else if is_file
+        script(type="module" src="/javascripts/editor.bundle.js")
